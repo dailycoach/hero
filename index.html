@@ -1,0 +1,1258 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>COACHERO | COACH 5-5-1 (v2.6)</title>
+  <style>
+    :root{
+      --bg:#fbfbf7;
+      --card:#ffffff;
+      --ink:#0f172a;
+      --muted:#64748b;
+      --line:rgba(2,6,23,.08);
+      --accent:#0f766e; /* teal */
+      --accent2:#2563eb; /* blue */
+      --danger:#b91c1c;
+      --radius:18px;
+      --shadow:0 10px 30px rgba(2,6,23,.06);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background:linear-gradient(180deg, var(--bg), #fff);
+      color:var(--ink);
+    }
+    a{color:inherit}
+    .wrap{
+      max-width:980px;
+      margin:0 auto;
+      padding:18px 14px 60px;
+    }
+    .topbar{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      padding:16px 14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.7);
+      backdrop-filter:saturate(140%) blur(10px);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      position:sticky;
+      top:10px;
+      z-index:10;
+    }
+    .brand h1{
+      margin:0;
+      font-size:16px;
+      letter-spacing:.4px;
+      font-weight:900;
+    }
+    .brand .sub{
+      margin-top:4px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+    .top-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+    }
+    .card{
+      margin-top:12px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:12px;
+    }
+    @media (max-width: 860px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .row{display:flex; gap:10px; align-items:center}
+    .row.top{align-items:flex-start}
+    .row.between{justify-content:space-between}
+    .row.wrap{flex-wrap:wrap}
+
+    .hr{height:1px;background:var(--line);margin:12px 0}
+    .pill{
+      display:inline-flex;
+      padding:5px 10px;
+      border-radius:999px;
+      border:1px solid rgba(2,6,23,.12);
+      background:rgba(2,6,23,.03);
+      font-size:11px;
+      color:var(--muted);
+      font-weight:900;
+      letter-spacing:.2px;
+      white-space:nowrap;
+    }
+    h2{
+      margin:0 0 8px;
+      font-size:15px;
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+    h3{
+      margin:0 0 8px;
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+    .sub{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.55;
+    }
+    .muted{font-size:12px;color:var(--muted)}
+    .small{font-size:11px;color:var(--muted)}
+    .kbd{
+      font-family:var(--mono);
+      font-size:11px;
+      padding:2px 6px;
+      border-radius:8px;
+      border:1px solid rgba(2,6,23,.12);
+      background:rgba(2,6,23,.03);
+    }
+
+    /* Buttons */
+    button{
+      font-family:inherit;
+      cursor:pointer;
+      border:1px solid transparent;
+      border-radius:999px;
+      padding:10px 12px;
+      font-weight:900;
+      font-size:13px;
+      line-height:1;
+      transition:.15s ease;
+      user-select:none;
+    }
+    button:disabled{opacity:.55;cursor:not-allowed}
+    .primary{
+      background:var(--accent);
+      color:#fff;
+      border-color:rgba(15,118,110,.9);
+    }
+    .primary:hover{filter:brightness(.98)}
+    .ghost{
+      background:rgba(2,6,23,.03);
+      color:var(--ink);
+      border-color:rgba(2,6,23,.10);
+    }
+    .ghost:hover{background:rgba(2,6,23,.05)}
+    .danger{
+      background:rgba(185,28,28,.08);
+      border-color:rgba(185,28,28,.22);
+      color:#7f1d1d;
+    }
+    .danger:hover{background:rgba(185,28,28,.12)}
+
+    /* Inputs */
+    input[type="date"], input[type="text"], textarea{
+      width:100%;
+      border:1px solid rgba(2,6,23,.12);
+      border-radius:14px;
+      padding:11px 12px;
+      font-size:14px;
+      outline:none;
+      background:#fff;
+      color:var(--ink);
+    }
+    textarea{min-height:92px; resize:vertical}
+    input:focus, textarea:focus{
+      border-color:rgba(15,118,110,.55);
+      box-shadow:0 0 0 4px rgba(15,118,110,.12);
+    }
+    .label{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin:0 0 8px;
+    }
+    .label b{font-size:12px}
+    .help{font-size:11px;color:var(--muted);line-height:1.45}
+
+    /* Action card */
+    .actionCard{
+      border:1px solid rgba(15,118,110,.18);
+      background:rgba(15,118,110,.05);
+      border-radius:16px;
+      padding:12px;
+    }
+
+    /* Date list */
+    .dateList{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .dateItem{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      padding:10px 10px;
+      border-radius:14px;
+      border:1px solid rgba(2,6,23,.10);
+      background:rgba(255,255,255,.7);
+    }
+    .dateItem.active{
+      border-color:rgba(15,118,110,.40);
+      box-shadow:0 0 0 4px rgba(15,118,110,.10);
+    }
+    .dateItem .left{
+      min-width:0;
+    }
+    .dateItem .d{
+      font-weight:900;
+      font-size:13px;
+      margin:0;
+    }
+    .dateItem .m{
+      font-size:11px;
+      color:var(--muted);
+      margin-top:3px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:320px;
+    }
+    .miniBtn{
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid rgba(2,6,23,.12);
+      background:rgba(2,6,23,.03);
+      font-weight:900;
+    }
+    .miniBtn:hover{background:rgba(2,6,23,.05)}
+
+    /* Keyword chips */
+    .chips{display:flex; gap:8px; flex-wrap:wrap}
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(2,6,23,.10);
+      background:rgba(2,6,23,.03);
+      font-size:12px;
+      font-weight:900;
+      color:var(--ink);
+      cursor:pointer;
+      user-select:none;
+    }
+    .chip.on{
+      border-color:rgba(15,118,110,.40);
+      background:rgba(15,118,110,.08);
+    }
+
+    /* Toast */
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      background:rgba(15,23,42,.92);
+      color:#fff;
+      padding:10px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:900;
+      box-shadow:0 12px 28px rgba(2,6,23,.18);
+      z-index:50;
+      display:none;
+      max-width:min(720px, calc(100vw - 26px));
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    /* Print */
+    @media print{
+      .no-print{display:none !important}
+      body{background:#fff}
+      .card{box-shadow:none}
+      .topbar{position:static;box-shadow:none}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <header class="topbar no-print">
+      <div class="brand">
+        <h1>COACHERO | COACH 5-5-1</h1>
+        <div class="sub">
+          매일은 셀프코칭, 매주는 리더십. 오늘의 설교 핵심을 “행동 1개”로 연결합니다. (v2.6)
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button class="ghost" id="btnToday">오늘로</button>
+        <button class="ghost" id="btnExportKakao">카톡용 내보내기</button>
+        <button class="ghost" id="btnExportText">텍스트 내보내기</button>
+        <button class="danger" id="btnResetDay">오늘 기록 초기화</button>
+      </div>
+    </header>
+
+    <!-- QT CARD v2.6 -->
+    <section class="card no-print" id="qtCard" aria-label="today-qt">
+      <div class="row between top">
+        <div>
+          <h2>오늘의 QT</h2>
+          <p class="sub" style="margin:0;">
+            A안(링크 카드) 기반. 요약/자동삽입은 QT 프록시 연결 시에만 동작합니다.
+          </p>
+        </div>
+        <span class="pill">LINK</span>
+      </div>
+
+      <div class="hr"></div>
+
+      <!-- toast-in-card -->
+      <div id="qtToast" style="
+        display:none;
+        margin-bottom:12px;
+        border:1px solid rgba(15,118,110,.22);
+        background: rgba(15,118,110,.06);
+        border-radius:14px;
+        padding:10px 12px;
+        font-size:12px;
+        color: var(--ink);
+        font-weight:900;
+      "></div>
+
+      <div id="qtSummaryWrap" style="display:none;">
+        <div class="actionCard" style="margin-bottom:12px;">
+          <h3 style="margin:0 0 6px;">요약</h3>
+          <p id="qtSummary" style="margin:0; font-weight:800; line-height:1.55;"></p>
+          <div class="muted" id="qtMeta" style="margin-top:8px;"></div>
+        </div>
+
+        <div id="qtQuestionsWrap" style="display:none;">
+          <div class="row between" style="gap:10px;">
+            <h3 style="margin:0;">오늘의 만나 질문(클릭 → O에 삽입)</h3>
+            <button class="ghost" type="button" id="btnQtInsertBoth" style="display:none;">질문 둘 다 삽입</button>
+          </div>
+          <div class="row wrap" id="qtQuestionButtons" style="gap:8px; margin-top:10px;"></div>
+          <div class="sub" style="margin-top:8px;">O(Open Questions)는 “정답”이 아니라 “질문”을 남기는 단계입니다.</div>
+        </div>
+
+        <div class="hr"></div>
+      </div>
+
+      <div class="row wrap" style="gap:10px; align-items:center;">
+        <a class="primary" style="display:inline-flex; align-items:center; justify-content:center; padding:10px 12px; text-decoration:none;"
+           href="https://oryun.org/life/?menu=248" target="_blank" rel="noopener">원문보기</a>
+        <button class="primary" type="button" id="btnQtLoad">오늘 QT 불러오기</button>
+        <button class="ghost" type="button" id="btnQtCopyLink">링크 복사</button>
+        <span id="qtHint" class="sub" style="margin:0;">요약/자동삽입을 켜려면 “QT 프록시”를 연결하세요.</span>
+      </div>
+
+      <details id="qtProxyHelp" style="margin-top:12px;">
+        <summary style="cursor:pointer; font-weight:900; color:var(--muted);">(관리자) QT 프록시 연결 방법</summary>
+        <div class="sub" style="margin-top:8px; line-height:1.7;">
+          브라우저에서 오륜교회 페이지를 직접 읽어오면(CORS) 대개 차단됩니다.<br/>
+          서버리스 프록시가 오륜교회 QT 페이지를 서버-서버로 가져와 JSON으로 변환해주면,
+          이 카드에 요약/질문 버튼/자동삽입이 활성화됩니다.<br/><br/>
+          아래 스크립트의 <b>QT_PROXY_ENDPOINT</b> 값을 프록시 URL로 설정하세요.
+        </div>
+      </details>
+    </section>
+
+    <!-- MAIN GRID -->
+    <div class="grid">
+
+      <!-- LEFT: COACH -->
+      <section class="card" aria-label="coach-main">
+        <div class="row between top">
+          <div>
+            <h2>오늘의 COACH</h2>
+            <div class="sub" style="margin-top:2px;">
+              오늘은 “리더” 관점으로 기록합니다. 목적은 완벽이 아니라 <b>행동 1개</b>입니다.
+            </div>
+          </div>
+
+          <div class="row wrap" style="justify-content:flex-end;">
+            <span class="pill" id="pillDate">—</span>
+            <span class="pill" id="pillWeek">—</span>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- Sermon Core -->
+        <div class="label">
+          <b>설교 핵심 1문장</b>
+          <span class="help">QT 프록시를 쓰면 자동 초안이 입력될 수 있습니다.</span>
+        </div>
+        <input id="sermon" type="text" placeholder="예: 깨어 있으라 (눅 21:29-38)" />
+
+        <div class="hr"></div>
+
+        <!-- COACH fields -->
+        <div class="label">
+          <b>C — Check Distance</b>
+          <span class="help">지금 내 상태/거리/속도를 점검</span>
+        </div>
+        <textarea id="c1" placeholder="예: 지금 나는 무엇에 과부하가 걸려있는가? (1~2문장)"></textarea>
+
+        <div class="hr"></div>
+
+        <div class="label">
+          <b>O — Open Questions</b>
+          <span class="help">질문으로 사고를 열기</span>
+        </div>
+        <textarea id="o" placeholder="예: 오늘 말씀을 내 현실에 적용하면, 내가 피하고 있는 질문은 무엇인가?"></textarea>
+
+        <div class="hr"></div>
+
+        <div class="label">
+          <b>A — Alternatives</b>
+          <span class="help">대안 3개(작게, 현실적으로)</span>
+        </div>
+        <textarea id="a" placeholder="예: ①… ②… ③… (작은 행동 중심)"></textarea>
+
+        <div class="hr"></div>
+
+        <div class="label">
+          <b>C — Commit</b>
+          <span class="help">오늘 ‘딱 1개’ 선택</span>
+        </div>
+        <textarea id="c2" placeholder="예: 오늘은 10분이라도 먼저 기도하고 1통만 정리한다."></textarea>
+
+        <div class="hr"></div>
+
+        <div class="label">
+          <b>H — Habits / Hold</b>
+          <span class="help">유지 루틴(5-5-1)과 체크</span>
+        </div>
+        <textarea id="h" placeholder="예: 5일/5분/1액션 유지. 장애물은 무엇이고, 대비는?"></textarea>
+
+        <div class="hr"></div>
+
+        <!-- 5-5-1 Quick Journal -->
+        <div class="actionCard">
+          <div class="row between top">
+            <div>
+              <h3 style="margin:0 0 6px;">COACH 5-5-1 루틴</h3>
+              <div class="sub" style="margin:0;">
+                <b>주 5일</b> · <b>5분</b> · <b>행동 1개</b><br/>
+                아래 문장을 그대로 채우면 됩니다.
+              </div>
+            </div>
+            <span class="pill">SELF</span>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="label">
+            <b>5분 문장(복사해서 쓰기)</b>
+            <span class="help">한 번에 완성하려고 하지 마세요.</span>
+          </div>
+          <textarea id="routineSentence" style="min-height:120px;" placeholder=""></textarea>
+
+          <div class="row wrap" style="margin-top:10px;">
+            <button class="ghost" id="btnFillSentence">문장 자동 조립</button>
+            <button class="ghost" id="btnCopySentence">문장 복사</button>
+            <button class="primary" id="btnMarkActionDone">오늘 1 Action 완료 체크</button>
+          </div>
+
+          <div class="small" id="actionStatus" style="margin-top:10px;">
+            완료 여부는 자동 저장됩니다.
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- Keywords -->
+        <div class="label">
+          <b>키워드(선택)</b>
+          <span class="help">쉼표로 구분 (예: 경청, 절제, 용기)</span>
+        </div>
+        <input id="keywords" type="text" placeholder="예: 질문, 순종, 관계" />
+
+        <div class="row wrap" style="margin-top:10px;">
+          <button class="primary" id="btnSave">저장</button>
+          <button class="ghost" id="btnNewDay">새 날짜 만들기</button>
+        </div>
+
+        <div class="small" style="margin-top:10px;">
+          자동 저장: 입력할 때마다 저장됩니다. “저장”은 수동 확정 버튼입니다.
+        </div>
+      </section>
+
+      <!-- RIGHT: Timeline / Weekly -->
+      <section class="card" aria-label="side-panel">
+        <div class="row between top">
+          <div>
+            <h2>기록 관리</h2>
+            <div class="sub">날짜/키워드/주간 목표를 관리합니다.</div>
+          </div>
+          <span class="pill">LEADER</span>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="label">
+          <b>날짜 선택</b>
+          <span class="help">선택한 날짜가 편집 대상입니다.</span>
+        </div>
+        <input type="date" id="datePicker" />
+
+        <div class="hr"></div>
+
+        <div class="label">
+          <b>키워드 클릭 → 날짜 필터</b>
+          <span class="help">전체 기록에서 상위 키워드를 제공합니다.</span>
+        </div>
+        <div class="chips" id="keywordChips"></div>
+        <div class="small" style="margin-top:8px;">
+          필터 해제: <span class="kbd">전체</span> 칩을 다시 누르세요.
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="label">
+          <b>주간 목표 1줄(고정)</b>
+          <span class="help">그 주의 ‘리더십 방향’ 1문장</span>
+        </div>
+        <input id="weeklyGoal" type="text" placeholder="예: 이번 주는 ‘질문으로 반응을 늦춘다’" />
+        <div class="row wrap" style="margin-top:10px;">
+          <button class="primary" id="btnSaveWeeklyGoal">주간 목표 저장</button>
+          <button class="ghost" id="btnCopyWeekly">주간 요약 복사</button>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="actionCard">
+          <h3 style="margin:0 0 8px;">주간 회고 1줄(자동)</h3>
+          <div class="sub" style="margin:0 0 10px;">
+            자동 계산: 완료한 Action 수 + 자주 나온 키워드
+          </div>
+          <div id="weeklyReview" style="font-weight:900; line-height:1.55;"></div>
+          <div class="small" id="weeklyStats" style="margin-top:8px;"></div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="label">
+          <b>날짜 목록</b>
+          <span class="help">요약(설교 핵심)이 함께 표시됩니다.</span>
+        </div>
+        <div class="dateList" id="dateList"></div>
+
+        <div class="row wrap" style="margin-top:12px;">
+          <button class="ghost" id="btnExportAll">전체 백업(JSON)</button>
+          <button class="danger" id="btnWipeAll">전체 초기화</button>
+        </div>
+
+        <div class="small" style="margin-top:10px;">
+          주의: “전체 초기화”는 되돌릴 수 없습니다.
+        </div>
+      </section>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script>
+    /******************************************************************
+     * COACHERO v2.6
+     * - 로컬 저장: localStorage
+     * - 날짜별 기록
+     * - 키워드 칩 필터
+     * - 주간 목표 1줄 + 자동 주간 회고 1줄
+     * - 내보내기(카톡/텍스트/JSON)
+     * - QT 카드: 링크 + 수동 불러오기(프록시 연결 시 요약/자동삽입/질문버튼)
+     ******************************************************************/
+
+    /* ========= Storage ========= */
+    const LS_KEY = "coachero_coach_551_v26";
+    const LS_WEEK_KEY = "coachero_weekly_goal_v26";
+
+    function loadState(){
+      try{ return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); }
+      catch{ return {}; }
+    }
+    function saveState(s){
+      localStorage.setItem(LS_KEY, JSON.stringify(s));
+    }
+
+    function loadWeekly(){
+      try{ return JSON.parse(localStorage.getItem(LS_WEEK_KEY) || "{}"); }
+      catch{ return {}; }
+    }
+    function saveWeekly(w){
+      localStorage.setItem(LS_WEEK_KEY, JSON.stringify(w));
+    }
+
+    /* ========= Date utils ========= */
+    const pad = n => String(n).padStart(2,"0");
+    function todayISO(){
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = pad(d.getMonth()+1);
+      const da = pad(d.getDate());
+      return `${y}-${m}-${da}`;
+    }
+    function formatK(iso){
+      // YYYY-MM-DD -> YYYY.MM.DD
+      const [y,m,d] = iso.split("-");
+      return `${y}.${m}.${d}`;
+    }
+    function getISOWeekKey(iso){
+      // ISO week key: YYYY-Www
+      const date = new Date(iso + "T00:00:00");
+      // Thursday in current week decides the year.
+      const target = new Date(date.valueOf());
+      const dayNr = (date.getDay() + 6) % 7; // Mon=0
+      target.setDate(target.getDate() - dayNr + 3);
+      const firstThursday = new Date(target.getFullYear(),0,4);
+      const firstDayNr = (firstThursday.getDay() + 6) % 7;
+      firstThursday.setDate(firstThursday.getDate() - firstDayNr + 3);
+      const weekNo = 1 + Math.round((target - firstThursday) / 604800000);
+      return `${target.getFullYear()}-W${pad(weekNo)}`;
+    }
+    function weekLabel(iso){
+      const wk = getISOWeekKey(iso);
+      return wk;
+    }
+
+    /* ========= DOM ========= */
+    const el = id => document.getElementById(id);
+
+    const pillDate = el("pillDate");
+    const pillWeek = el("pillWeek");
+    const datePicker = el("datePicker");
+    const dateList = el("dateList");
+    const keywordChips = el("keywordChips");
+
+    const sermon = el("sermon");
+    const c1 = el("c1");
+    const o = el("o");
+    const a = el("a");
+    const c2 = el("c2");
+    const h = el("h");
+    const keywords = el("keywords");
+
+    const routineSentence = el("routineSentence");
+    const actionStatus = el("actionStatus");
+
+    const weeklyGoal = el("weeklyGoal");
+    const weeklyReview = el("weeklyReview");
+    const weeklyStats = el("weeklyStats");
+
+    const toast = el("toast");
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.style.display = "block";
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(()=> toast.style.display="none", 1600);
+    }
+
+    /* ========= App state ========= */
+    let state = loadState(); // { days: { [iso]: {...} } }
+    if(!state.days) state.days = {};
+    let weekly = loadWeekly(); // { [weekKey]: { goal:"..." } }
+
+    let activeDate = todayISO();
+    let keywordFilter = "ALL";
+
+    /* ========= Day model ========= */
+    function ensureDay(iso){
+      if(!state.days[iso]){
+        state.days[iso] = {
+          sermon:"",
+          c1:"", o:"", a:"", c2:"", h:"",
+          keywords:"",
+          actionDone:false,
+          updatedAt: new Date().toISOString()
+        };
+        saveState(state);
+      }
+      return state.days[iso];
+    }
+
+    /* ========= Render ========= */
+    function setHeader(){
+      pillDate.textContent = formatK(activeDate);
+      pillWeek.textContent = weekLabel(activeDate);
+    }
+
+    function loadInputs(){
+      const d = ensureDay(activeDate);
+      sermon.value = d.sermon || "";
+      c1.value = d.c1 || "";
+      o.value = d.o || "";
+      a.value = d.a || "";
+      c2.value = d.c2 || "";
+      h.value = d.h || "";
+      keywords.value = d.keywords || "";
+
+      updateRoutineSentence(false);
+      renderActionStatus();
+      renderWeekly();
+    }
+
+    function saveInputs(silent=true){
+      const d = ensureDay(activeDate);
+      d.sermon = sermon.value || "";
+      d.c1 = c1.value || "";
+      d.o = o.value || "";
+      d.a = a.value || "";
+      d.c2 = c2.value || "";
+      d.h = h.value || "";
+      d.keywords = keywords.value || "";
+      d.updatedAt = new Date().toISOString();
+      saveState(state);
+      if(!silent) showToast("저장했습니다.");
+      renderSide();
+    }
+
+    function renderActionStatus(){
+      const d = ensureDay(activeDate);
+      actionStatus.innerHTML = d.actionDone
+        ? `<span class="pill" style="border-color:rgba(15,118,110,.35); background:rgba(15,118,110,.08); color:var(--ink);">오늘 1 Action 완료</span> <span class="small">(${new Date(d.updatedAt).toLocaleString()})</span>`
+        : `<span class="pill">오늘 1 Action 미완료</span> <span class="small">완료 체크는 저장됩니다.</span>`;
+    }
+
+    function updateRoutineSentence(overwrite=true){
+      const d = ensureDay(activeDate);
+      const sentence =
+`[말씀/핵심 1문장]
+${(sermon.value || "").trim() || "—"}
+
+[관찰(상태 점검)]
+${(c1.value || "").trim() || "—"}
+
+[질문(O)]
+${(o.value || "").trim() || "—"}
+
+[대안(A)]
+${(a.value || "").trim() || "—"}
+
+[오늘 1 Action(Commit)]
+${(c2.value || "").trim() || "—"}
+
+[유지(H)]
+${(h.value || "").trim() || "—"}
+
+(5-5-1) 이번 주 5일 중 오늘 5분 기록 → 행동 1개 실행`;
+      if(overwrite) routineSentence.value = sentence;
+      else if(!routineSentence.value.trim()) routineSentence.value = sentence;
+    }
+
+    function renderSide(){
+      // date picker
+      datePicker.value = activeDate;
+
+      // keyword chips
+      const freq = keywordFrequency();
+      const top = Object.entries(freq)
+        .sort((a,b)=>b[1]-a[1])
+        .slice(0, 10)
+        .map(([k,v])=>({k,v}));
+
+      keywordChips.innerHTML = "";
+      const allChip = document.createElement("div");
+      allChip.className = "chip " + (keywordFilter==="ALL" ? "on":"");
+      allChip.textContent = "전체";
+      allChip.onclick = ()=>{
+        keywordFilter = "ALL";
+        renderSide();
+      };
+      keywordChips.appendChild(allChip);
+
+      top.forEach(({k,v})=>{
+        const chip = document.createElement("div");
+        chip.className = "chip " + (keywordFilter===k ? "on":"");
+        chip.textContent = `${k}`;
+        chip.title = `등장 ${v}회`;
+        chip.onclick = ()=>{
+          keywordFilter = (keywordFilter===k) ? "ALL" : k;
+          renderSide();
+        };
+        keywordChips.appendChild(chip);
+      });
+
+      // date list
+      const dates = Object.keys(state.days).sort((a,b)=> b.localeCompare(a));
+      const filtered = (keywordFilter==="ALL") ? dates : dates.filter(d=>{
+        const kw = (state.days[d].keywords || "");
+        return kw.split(",").map(x=>x.trim()).filter(Boolean).includes(keywordFilter);
+      });
+
+      dateList.innerHTML = "";
+      if(filtered.length===0){
+        const empty = document.createElement("div");
+        empty.className = "sub";
+        empty.textContent = "표시할 기록이 없습니다.";
+        dateList.appendChild(empty);
+      } else {
+        filtered.slice(0, 30).forEach(d=>{
+          const item = document.createElement("div");
+          item.className = "dateItem" + (d===activeDate ? " active":"");
+          const left = document.createElement("div");
+          left.className = "left";
+
+          const title = document.createElement("div");
+          title.className = "d";
+          title.textContent = formatK(d);
+
+          const meta = document.createElement("div");
+          meta.className = "m";
+          const s = (state.days[d].sermon || "").trim();
+          meta.textContent = s ? s : "설교 핵심 1문장 없음";
+
+          left.appendChild(title);
+          left.appendChild(meta);
+
+          const right = document.createElement("button");
+          right.className = "miniBtn";
+          right.textContent = "열기";
+          right.onclick = ()=>{
+            activeDate = d;
+            setHeader();
+            loadInputs();
+            renderSide();
+          };
+
+          item.appendChild(left);
+          item.appendChild(right);
+          dateList.appendChild(item);
+        });
+      }
+
+      renderWeekly();
+    }
+
+    function keywordFrequency(){
+      const freq = {};
+      Object.values(state.days).forEach(d=>{
+        (d.keywords||"")
+          .split(",")
+          .map(x=>x.trim())
+          .filter(Boolean)
+          .forEach(k=>{
+            freq[k] = (freq[k]||0) + 1;
+          });
+      });
+      return freq;
+    }
+
+    function renderWeekly(){
+      const wk = getISOWeekKey(activeDate);
+      weeklyGoal.value = (weekly[wk] && weekly[wk].goal) ? weekly[wk].goal : "";
+
+      // compute auto weekly review
+      const daysInWeek = Object.keys(state.days).filter(d => getISOWeekKey(d)===wk);
+      const doneCount = daysInWeek.filter(d => !!state.days[d].actionDone).length;
+
+      const kwFreq = {};
+      daysInWeek.forEach(d=>{
+        (state.days[d].keywords||"")
+          .split(",")
+          .map(x=>x.trim())
+          .filter(Boolean)
+          .forEach(k => kwFreq[k] = (kwFreq[k]||0) + 1);
+      });
+      const topKw = Object.entries(kwFreq).sort((a,b)=>b[1]-a[1]).slice(0,2).map(x=>x[0]);
+
+      const goal = (weekly[wk] && weekly[wk].goal) ? weekly[wk].goal.trim() : "";
+      const kwPart = topKw.length ? `핵심 키워드: ${topKw.join(", ")}` : "핵심 키워드: (미설정)";
+      const line = goal
+        ? `이번 주 목표는 “${goal}”. Action 완료 ${doneCount}/${Math.max(daysInWeek.length,1)}일. ${kwPart}`
+        : `이번 주 Action 완료 ${doneCount}/${Math.max(daysInWeek.length,1)}일. ${kwPart}`;
+
+      weeklyReview.textContent = line;
+      weeklyStats.textContent = `주간키: ${wk} · 기록일수: ${daysInWeek.length} · 완료일수: ${doneCount}`;
+    }
+
+    /* ========= Exports ========= */
+    function buildExportText(iso){
+      const d = ensureDay(iso);
+      const lines = [];
+      lines.push(`COACHERO | ${formatK(iso)} (${getISOWeekKey(iso)})`);
+      lines.push("");
+      if((d.sermon||"").trim()){
+        lines.push(`설교 핵심 1문장: ${d.sermon.trim()}`);
+        lines.push("");
+      }
+      lines.push(`[C] Check Distance`);
+      lines.push(d.c1?.trim() || "—");
+      lines.push("");
+      lines.push(`[O] Open Questions`);
+      lines.push(d.o?.trim() || "—");
+      lines.push("");
+      lines.push(`[A] Alternatives`);
+      lines.push(d.a?.trim() || "—");
+      lines.push("");
+      lines.push(`[C] Commit (오늘 1 Action)`);
+      lines.push(d.c2?.trim() || "—");
+      lines.push("");
+      lines.push(`[H] Habits / Hold`);
+      lines.push(d.h?.trim() || "—");
+      lines.push("");
+      lines.push(`키워드: ${(d.keywords||"").trim() || "—"}`);
+      lines.push(`오늘 1 Action: ${d.actionDone ? "완료" : "미완료"}`);
+      return lines.join("\n");
+    }
+
+    function buildKakaoText(iso){
+      const d = ensureDay(iso);
+      const lines = [];
+      lines.push(`COACHERO ${formatK(iso)}`);
+      if((d.sermon||"").trim()) lines.push(`• 말씀: ${d.sermon.trim()}`);
+      lines.push(`• 오늘 1 Action: ${(d.c2||"").trim() || "—"}`);
+      const k = (d.keywords||"").split(",").map(x=>x.trim()).filter(Boolean).slice(0,3);
+      if(k.length) lines.push(`• 키워드: ${k.join(", ")}`);
+      lines.push(`• 완료: ${d.actionDone ? "✅" : "⬜"}`);
+      return lines.join("\n");
+    }
+
+    async function copyToClipboard(text){
+      try{
+        await navigator.clipboard.writeText(text);
+        showToast("복사했습니다.");
+      }catch{
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        showToast("복사했습니다.");
+      }
+    }
+
+    /* ========= Events ========= */
+    // Auto-save on input
+    [sermon,c1,o,a,c2,h,keywords].forEach(node=>{
+      node.addEventListener("input", ()=>{
+        saveInputs(true);
+        // keep sentence in sync without being too aggressive
+        updateRoutineSentence(true);
+      });
+    });
+
+    el("btnSave").addEventListener("click", ()=> saveInputs(false));
+
+    el("btnToday").addEventListener("click", ()=>{
+      activeDate = todayISO();
+      setHeader();
+      loadInputs();
+      renderSide();
+      showToast("오늘 날짜로 이동");
+    });
+
+    el("btnNewDay").addEventListener("click", ()=>{
+      const iso = datePicker.value || todayISO();
+      ensureDay(iso);
+      activeDate = iso;
+      setHeader();
+      loadInputs();
+      renderSide();
+      showToast("날짜가 생성/선택되었습니다.");
+    });
+
+    datePicker.addEventListener("change", ()=>{
+      const iso = datePicker.value;
+      if(!iso) return;
+      ensureDay(iso);
+      activeDate = iso;
+      setHeader();
+      loadInputs();
+      renderSide();
+    });
+
+    el("btnFillSentence").addEventListener("click", ()=>{
+      updateRoutineSentence(true);
+      showToast("문장을 조립했습니다.");
+    });
+
+    el("btnCopySentence").addEventListener("click", ()=>{
+      copyToClipboard(routineSentence.value || "");
+    });
+
+    el("btnMarkActionDone").addEventListener("click", ()=>{
+      const d = ensureDay(activeDate);
+      d.actionDone = !d.actionDone;
+      d.updatedAt = new Date().toISOString();
+      saveState(state);
+      renderActionStatus();
+      renderWeekly();
+      renderSide();
+      showToast(d.actionDone ? "오늘 1 Action 완료로 표시" : "완료 표시 해제");
+    });
+
+    el("btnExportText").addEventListener("click", ()=>{
+      copyToClipboard(buildExportText(activeDate));
+    });
+
+    el("btnExportKakao").addEventListener("click", ()=>{
+      copyToClipboard(buildKakaoText(activeDate));
+    });
+
+    el("btnExportAll").addEventListener("click", ()=>{
+      const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `COACHERO_backup_${todayISO()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("백업 파일을 저장했습니다.");
+    });
+
+    el("btnResetDay").addEventListener("click", ()=>{
+      if(!confirm("현재 선택된 날짜의 기록을 초기화할까요?")) return;
+      state.days[activeDate] = {
+        sermon:"",
+        c1:"", o:"", a:"", c2:"", h:"",
+        keywords:"",
+        actionDone:false,
+        updatedAt: new Date().toISOString()
+      };
+      saveState(state);
+      loadInputs();
+      renderSide();
+      showToast("해당 날짜 기록을 초기화했습니다.");
+    });
+
+    el("btnWipeAll").addEventListener("click", ()=>{
+      if(!confirm("전체 기록을 정말 삭제할까요? (되돌릴 수 없음)")) return;
+      localStorage.removeItem(LS_KEY);
+      localStorage.removeItem(LS_WEEK_KEY);
+      state = { days:{} };
+      weekly = {};
+      activeDate = todayISO();
+      ensureDay(activeDate);
+      setHeader();
+      loadInputs();
+      renderSide();
+      showToast("전체 초기화 완료");
+    });
+
+    el("btnSaveWeeklyGoal").addEventListener("click", ()=>{
+      const wk = getISOWeekKey(activeDate);
+      weekly[wk] = { goal: weeklyGoal.value || "" };
+      saveWeekly(weekly);
+      renderWeekly();
+      showToast("주간 목표를 저장했습니다.");
+    });
+
+    el("btnCopyWeekly").addEventListener("click", ()=>{
+      const wk = getISOWeekKey(activeDate);
+      const goal = (weekly[wk] && weekly[wk].goal) ? weekly[wk].goal.trim() : "";
+      const text = [
+        `COACHERO 주간 요약 (${wk})`,
+        goal ? `주간 목표: ${goal}` : `주간 목표: —`,
+        `회고: ${weeklyReview.textContent}`
+      ].join("\n");
+      copyToClipboard(text);
+    });
+
+    /* ========= Init ========= */
+    ensureDay(activeDate);
+    setHeader();
+    loadInputs();
+    renderSide();
+
+    /* ================================================================
+     * QT CARD v2.6 (수동 불러오기 + 성공 시: 요약/메타 + 설교핵심 자동 프리필 + O 질문 버튼 + 질문 둘 다 삽입)
+     * ================================================================ */
+    (() => {
+      const QT_URL = "https://oryun.org/life/?menu=248";
+
+      const btnCopy = el("btnQtCopyLink");
+      const btnLoad = el("btnQtLoad");
+      const toastInCard = el("qtToast");
+
+      const wrap = el("qtSummaryWrap");
+      const summaryEl = el("qtSummary");
+      const metaEl = el("qtMeta");
+      const hintEl = el("qtHint");
+      const helpEl = el("qtProxyHelp");
+
+      const qWrap = el("qtQuestionsWrap");
+      const qButtons = el("qtQuestionButtons");
+      const btnBoth = el("btnQtInsertBoth");
+
+      // Cloudflare Worker 예: https://your-worker.workers.dev/qt
+      const QT_PROXY_ENDPOINT = ""; // <-- 여기에 프록시 URL 입력
+
+      let cardToastTimer = null;
+      function showCardToast(msg){
+        toastInCard.textContent = msg;
+        toastInCard.style.display = "block";
+        clearTimeout(cardToastTimer);
+        cardToastTimer = setTimeout(()=>{
+          toastInCard.style.display = "none";
+          toastInCard.textContent = "";
+        }, 1600);
+      }
+
+      function normalize(s){ return String(s||"").replace(/\s+/g," ").trim(); }
+
+      async function copyText(text){
+        try{ await navigator.clipboard.writeText(text); }
+        catch{
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
+      }
+
+      function buildSermonDraft(data){
+        const t = normalize(data.title);
+        const p = normalize(data.passage);
+        if (t && p) return `${t} (${p})`;
+        if (t) return t;
+        if (p) return p;
+        return "";
+      }
+
+      function setSermonIfEmpty(text){
+        const cur = normalize(sermon.value);
+        if(cur) return false;
+        const draft = normalize(text);
+        if(!draft) return false;
+        sermon.value = draft;
+        sermon.dispatchEvent(new Event("input", {bubbles:true}));
+        return true;
+      }
+
+      function insertIntoO(question){
+        const q = normalize(question);
+        if(!q) return;
+        const cur = normalize(o.value);
+        o.value = cur ? `${cur}\n${q}` : q;
+        o.dispatchEvent(new Event("input", {bubbles:true}));
+        o.focus();
+      }
+
+      function renderQuestionButtons(questions){
+        qButtons.innerHTML = "";
+        const qs = (questions||[]).map(normalize).filter(Boolean).slice(0,2);
+        if(!qs.length){
+          qWrap.style.display = "none";
+          btnBoth.style.display = "none";
+          return;
+        }
+
+        qs.forEach((q, idx)=>{
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "ghost";
+          b.style.border = "1px solid rgba(15,118,110,.22)";
+          b.style.background = "rgba(15,118,110,.06)";
+          b.style.color = "var(--ink)";
+          b.style.maxWidth = "100%";
+          b.style.whiteSpace = "normal";
+          b.style.textAlign = "left";
+          b.style.lineHeight = "1.4";
+          b.textContent = `질문 ${idx+1}: ${q}`;
+          b.addEventListener("click", ()=> insertIntoO(q));
+          qButtons.appendChild(b);
+        });
+
+        btnBoth.style.display = qs.length >= 2 ? "inline-flex" : "none";
+        btnBoth.onclick = ()=>{
+          qs.forEach(q => insertIntoO(q));
+          showCardToast("질문 2개를 O에 삽입했습니다.");
+        };
+
+        qWrap.style.display = "block";
+      }
+
+      function setLoadedUI(){
+        hintEl.style.display = "none";
+        helpEl.style.display = "none";
+        wrap.style.display = "block";
+      }
+
+      function setFallbackUI(msg){
+        wrap.style.display = "none";
+        qWrap.style.display = "none";
+        hintEl.style.display = "inline";
+        hintEl.textContent = msg || "요약/자동삽입은 현재 환경에서 표시되지 않습니다. (원문보기로 진행)";
+        helpEl.open = false;
+      }
+
+      btnCopy.addEventListener("click", async ()=>{
+        await copyText(QT_URL);
+        btnCopy.textContent = "복사됨";
+        setTimeout(()=> btnCopy.textContent = "링크 복사", 1400);
+      });
+
+      btnLoad.addEventListener("click", async ()=>{
+        if(!QT_PROXY_ENDPOINT){
+          showCardToast("QT 프록시가 아직 연결되지 않았습니다. (원문보기로 진행)");
+          setFallbackUI("요약을 보려면 QT 프록시를 연결하세요. (원문보기로 진행)");
+          return;
+        }
+        btnLoad.disabled = true;
+        btnLoad.textContent = "불러오는 중...";
+
+        try{
+          const res = await fetch(QT_PROXY_ENDPOINT, {method:"GET"});
+          if(!res.ok) throw new Error("proxy response not ok");
+          const data = await res.json();
+          if(!data || data.ok === false) throw new Error("proxy returned ok:false");
+
+          const summary = normalize(data.summary);
+          if(!summary) throw new Error("empty summary");
+
+          setLoadedUI();
+          summaryEl.textContent = summary;
+
+          const bits = [];
+          if(data.dateText) bits.push(String(data.dateText).trim());
+          if(data.title) bits.push(`제목: ${normalize(data.title)}`);
+          if(data.passage) bits.push(`본문: ${normalize(data.passage)}`);
+          metaEl.textContent = bits.join(" · ");
+
+          const filled = setSermonIfEmpty(buildSermonDraft(data));
+          showCardToast(filled ? "설교 핵심 1문장을 자동 입력했습니다. (수정 가능)" : "QT 요약을 불러왔습니다.");
+
+          renderQuestionButtons(Array.isArray(data.questions) ? data.questions : []);
+
+        }catch(e){
+          setFallbackUI("요약/자동삽입을 불러오지 못했습니다. (원문보기로 진행)");
+          showCardToast("불러오기 실패: 원문보기로 진행하세요.");
+        }finally{
+          btnLoad.disabled = false;
+          btnLoad.textContent = "오늘 QT 불러오기";
+        }
+      });
+
+      // v2.6 정책: 자동 로드 없음(사용자 통제)
+    })();
+  </script>
+</body>
+</html>
