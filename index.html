@@ -578,6 +578,29 @@
       .btn{ transition:none !important; }
       .btn:hover{ transform:none !important; }
     }
+
+    /* ---------- Oryun QT block (safe & non-invasive) ---------- */
+    .qtBlock{
+      border:1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px;
+      background: rgba(21,22,16,.42);
+    }
+    [data-theme="light"] .qtBlock{ background: rgba(255,255,255,.92); }
+
+    .qtLabel{
+      font-size:12px;
+      color: var(--muted);
+      margin-bottom:6px;
+      font-weight:800;
+    }
+    .qtText{
+      white-space: pre-line;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+    #qtTitle{ font-weight: 900; letter-spacing: -.2px; }
+    #qtSummary{ font-weight: 900; color: var(--brand); }
   </style>
 </head>
 
@@ -588,7 +611,7 @@
         <h1>COACHERO 크루원 · 일일 기록</h1>
         <div class="subtitle">KOUM 4단계 기반 점검/성찰/실행 기록 — 카톡 공유·텍스트 복사 중심 (Earth Palette)</div>
         <div class="badge" id="versionBadge">
-          <span>템플릿</span> <b>v1.2</b> <span class="tiny">· KOUM · local-only</span>
+          <span>템플릿</span> <b>v1.3</b> <span class="tiny">· KOUM · local-only</span>
         </div>
       </div>
 
@@ -613,6 +636,64 @@
 
     <!-- TODAY -->
     <section id="tab-today">
+
+      <!-- ================= ORYUN QT (optional, default collapsed) ================= -->
+      <div class="card" id="qtCard" style="margin-bottom:14px">
+        <div style="display:flex; gap:10px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap">
+          <div style="min-width:260px">
+            <h2 style="margin:0 0 6px">오륜교회 오늘의 QT</h2>
+            <div class="tiny" id="qtStatus">닫힘 · 일일기록을 방해하지 않도록 ‘열기’할 때만 불러옵니다.</div>
+          </div>
+
+          <div style="display:flex; gap:8px; flex-wrap:wrap">
+            <button class="btn small secondary" type="button" id="qtToggleBtn">열기</button>
+            <button class="btn small" type="button" id="qtApplyBtn" title="질문1→O, 질문2→U (빈 칸만)">KOUM에 적용</button>
+            <button class="btn small" type="button" id="qtShareBtn" title="카톡 공유(미지원 시 복사)">카톡 공유</button>
+            <button class="btn small ghost" type="button" id="qtReloadBtn" title="QT 다시 불러오기">새로고침</button>
+          </div>
+        </div>
+
+        <div id="qtBody" style="display:none; margin-top:12px">
+          <div class="chips" style="margin-top:8px">
+            <span class="chip"><b id="qtDate">-</b></span>
+            <span class="chip">출처: <b>오륜교회 QT</b></span>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="qtBlock">
+            <div class="qtLabel">제목</div>
+            <div class="qtText" id="qtTitle">-</div>
+          </div>
+
+          <div class="qtBlock" style="margin-top:10px">
+            <div class="qtLabel">오늘의 QT 한 문장</div>
+            <div class="qtText" id="qtSummary">-</div>
+          </div>
+
+          <div class="qtBlock" style="margin-top:10px">
+            <div class="qtLabel">본문 말씀</div>
+            <div class="qtText" id="qtScripture">-</div>
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <div class="qtBlock">
+              <div class="qtLabel">오늘의 만나 질문 1</div>
+              <div class="qtText" id="qtQ1">-</div>
+            </div>
+            <div class="qtBlock">
+              <div class="qtLabel">오늘의 만나 질문 2</div>
+              <div class="qtText" id="qtQ2">-</div>
+            </div>
+          </div>
+
+          <div class="hint" style="margin-top:10px">
+            팁: “KOUM에 적용”을 누르면 질문1→O, 질문2→U에 자동으로 들어갑니다. (빈 칸만 채움)
+          </div>
+        </div>
+      </div>
+      <!-- ================= /ORYUN QT ================= -->
+
       <div class="grid">
         <div class="card">
           <h2>기본 체크인</h2>
@@ -856,10 +937,10 @@
     /***********************
      * COACHERO Daily Log
      * Single-file HTML
-     * v1.2 (Earth Palette)
+     * v1.3 (Earth Palette)
      ***********************/
 
-    const APP_VERSION = "v1.2";
+    const APP_VERSION = "v1.3";
     const SCHEMA_VERSION = 1;
 
     const STORAGE_KEYS = {
@@ -1407,6 +1488,148 @@
       toast("공유 미지원: 텍스트를 복사했습니다.");
     }
 
+    /* ===============================
+       ORYUN QT INTEGRATION (SAFE MODE)
+       - 기본 닫힘
+       - 열 때만 fetch
+       - 실패해도 앱 전체 기능 유지
+    ================================ */
+    const QT_API = "https://build.ros2468.workers.dev"; // 필요 시 여기만 수정
+    let __qtCache = null;
+
+    function qtOneLine(qt){
+      if (!qt) return "-";
+      const q1 = String(qt.question1||"").trim();
+      const q2 = String(qt.question2||"").trim();
+      if (q1 && q2) return `오늘 말씀은 “${q1}”, 그리고 “${q2}”로 나를 초대합니다.`;
+      const sc = String(qt.scripture||"").replace(/\s+/g," ").trim();
+      if (sc) return sc.length > 70 ? sc.slice(0,70) + "…" : sc;
+      return String(qt.title||"").trim() || "-";
+    }
+
+    function qtTrunc(s, n){
+      s = String(s||"").trim();
+      return s.length > n ? s.slice(0,n) + "…" : s;
+    }
+
+    async function qtFetch(force){
+      if (__qtCache && !force) return __qtCache;
+      const res = await fetch(QT_API, { cache:"no-store" });
+      if (!res.ok) throw new Error("QT fetch failed: " + res.status);
+      const data = await res.json();
+      __qtCache = data;
+      return data;
+    }
+
+    function qtRender(qt){
+      const d = $("qtDate"), t = $("qtTitle"), s = $("qtScripture"),
+            q1 = $("qtQ1"), q2 = $("qtQ2"), sum = $("qtSummary");
+      if (!d || !t || !s || !q1 || !q2 || !sum) return;
+
+      d.textContent = qt?.date || "-";
+      t.textContent = qt?.title || "-";
+      sum.textContent = qtOneLine(qt);
+      s.textContent = qt?.scripture || "-";
+      q1.textContent = qt?.question1 || "-";
+      q2.textContent = qt?.question2 || "-";
+    }
+
+    async function qtEnsure(force){
+      const status = $("qtStatus");
+      if (status) status.textContent = "불러오는 중...";
+      try{
+        const qt = await qtFetch(!!force);
+        qtRender(qt);
+        if (status) status.textContent = qt?.title ? "불러옴" : "내용 없음(페이지 구조 변경 가능)";
+        return qt;
+      }catch(err){
+        if (status) status.textContent = "불러오기 실패(일일기록 기능은 정상)";
+        toast("QT 불러오기 실패: Worker/배포/응답 필드 확인");
+        return null;
+      }
+    }
+
+    function qtApplyToKoum(qt){
+      if (!qt) return;
+
+      const oTitle = $("koum_O_title");
+      const oBody  = $("koum_O_body");
+      const uTitle = $("koum_U_title");
+      const uBody  = $("koum_U_body");
+
+      const q1 = String(qt.question1||"").trim();
+      const q2 = String(qt.question2||"").trim();
+
+      if (q1){
+        if (oTitle && !oTitle.value) oTitle.value = q1;
+        else if (oBody && !oBody.value) oBody.value = q1;
+      }
+      if (q2){
+        if (uTitle && !uTitle.value) uTitle.value = q2;
+        else if (uBody && !uBody.value) uBody.value = q2;
+      }
+
+      const word = $("word");
+      if (word && !word.value){
+        word.value = `【오륜교회 QT】 ${String(qt.title||"").trim()}\n\n${qtTrunc(qt.scripture, 320)}`;
+      }
+
+      toast("QT 질문을 KOUM(O/U)에 적용했습니다.");
+    }
+
+    async function qtShare(qt){
+      if (!qt) return;
+      const text =
+`📖 오륜교회 오늘의 QT
+
+${qt.date || ""}
+${qt.title || ""}
+
+✦ 한 문장 묵상
+${qtOneLine(qt)}
+
+✦ 본문 말씀
+${qtTrunc(qt.scripture, 420)}
+
+✦ 오늘의 만나 질문
+1) ${qt.question1 || "-"}
+2) ${qt.question2 || "-"}
+
+— COACHERO 일일 기록`;
+      await shareToKakaoOrCopy(text);
+    }
+
+    function bindOryunQT(){
+      const toggleBtn = $("qtToggleBtn");
+      const body = $("qtBody");
+      const reloadBtn = $("qtReloadBtn");
+      const applyBtn = $("qtApplyBtn");
+      const shareBtn = $("qtShareBtn");
+      const status = $("qtStatus");
+      if (!toggleBtn || !body) return;
+
+      // 초기 상태를 확실히 닫힘으로
+      body.style.display = "none";
+
+      toggleBtn.addEventListener("click", async ()=>{
+        const isClosed = (body.style.display === "none");
+        if (isClosed){
+          body.style.display = "";
+          toggleBtn.textContent = "닫기";
+          if (status) status.textContent = "불러오는 중...";
+          await qtEnsure(false);
+        } else {
+          body.style.display = "none";
+          toggleBtn.textContent = "열기";
+          if (status) status.textContent = "닫힘 · 일일기록을 방해하지 않도록 ‘열기’할 때만 불러옵니다.";
+        }
+      });
+
+      if (reloadBtn) reloadBtn.addEventListener("click", async ()=> { await qtEnsure(true); });
+      if (applyBtn)  applyBtn.addEventListener("click", async ()=> { const qt = await qtEnsure(false); qtApplyToKoum(qt); });
+      if (shareBtn)  shareBtn.addEventListener("click", async ()=> { const qt = await qtEnsure(false); await qtShare(qt); });
+    }
+
     function selectTab(tab){
       els.tabs.forEach(b=>{
         const is = b.dataset.tab === tab;
@@ -1732,6 +1955,9 @@
         toast("전체 데이터를 삭제했습니다.");
         location.reload();
       });
+
+      // ORYUN QT (safe): QT 오류가 앱 전체를 멈추지 않게
+      try{ bindOryunQT(); }catch(e){ /* noop */ }
     }
 
     function bindKoumImmediateSave(){
