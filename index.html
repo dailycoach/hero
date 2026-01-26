@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>COACHERO — QT · KOUM · Prayer · Share (v4.6 QT-proxy)</title>
+  <title>코치로 말씀과 묵상, 셀프코칭 그리고 감사 </title>
   <style>
     :root{
       --bg:#fbfaf6;
@@ -520,7 +520,7 @@
         <h2>Settings</h2>
         <p class="sub">QT 프록시 URL</p>
         <div style="height:10px"></div>
-        <input id="proxyInput" type="url" placeholder="https://build.ros2468.workers.dev/">
+        <input id="proxyInput" type="url" placeholder="https://.../qt">
         <div class="row" style="margin-top:10px;">
           <button id="btnSaveProxy" class="primary">저장</button>
           <button id="btnTestProxy" class="ghost">테스트</button>
@@ -667,6 +667,8 @@
   }
 
   // ---- Storage ----
+  const FALLBACK_PROXY = 'https://build.ros2468.workers.dev/';
+
   const LS = {
     entries:'entries',
     proxy:'QT_PROXY_ENDPOINT',
@@ -816,7 +818,10 @@
   }
 
   // ---- QT Fetch ----
-  function proxyEndpoint(){ return (localStorage.getItem(LS.proxy)||"").trim(); }
+  function proxyEndpoint(){
+    const v = (localStorage.getItem(LS.proxy)||"").trim();
+    return v || FALLBACK_PROXY;
+  }
 
   async function fetchQT(ymd){
     const proxy=proxyEndpoint();
@@ -1308,13 +1313,20 @@
   function loadSettings(){
     const v=proxyEndpoint();
     $('proxyInput').value=v;
-    $('proxyHint').textContent = v ? "프록시 저장됨" : "프록시가 비어있으면 QT 불러오기가 제한될 수 있어요.";
+    $('proxyHint').textContent = "기본 프록시가 적용됩니다.";
   }
   function saveProxy(){
     const v=($('proxyInput').value||"").trim();
+    if(!v){
+      localStorage.removeItem(LS.proxy);
+      $('proxyInput').value = FALLBACK_PROXY;
+      loadSettings();
+      toast("기본값 적용");
+      return;
+    }
     localStorage.setItem(LS.proxy, v);
     loadSettings();
-    toast(v?"저장":"삭제");
+    toast("저장");
   }
   async function testProxy(){
     const v=($('proxyInput').value||"").trim();
@@ -1419,6 +1431,10 @@
 
   // ---- Init ----
   function init(){
+    // Auto-fix proxy to the provided Worker endpoint
+    if(!(localStorage.getItem(LS.proxy)||"").trim()){
+      localStorage.setItem(LS.proxy, FALLBACK_PROXY);
+    }
     $('qtDate').value = todayYMD();
     const wk=weekdayKo(new Date());
     const v=weekdayVariant(wk);
